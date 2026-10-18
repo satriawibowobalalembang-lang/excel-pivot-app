@@ -10,14 +10,21 @@ st.set_page_config(page_title="Aplikasi Pivot Data Besar CSV", layout="wide")
 st.title("📊 Multi-File CSV Pivot Dashboard")
 st.write("Aplikasi pengolah data besar dari folder Google Drive menggunakan Python & DuckDB.")
 
-# 1. Autentikasi Google Drive via Streamlit Secrets (Aman dari error \n)
+# 1. Autentikasi Google Drive via Streamlit Secrets (Pembersihan format kunci mutlak)
 @st.cache_resource
 def get_drive_service():
     if "gcp_service_account" in st.secrets:
         creds_dict = dict(st.secrets["gcp_service_account"])
-        # Perbaikan otomatis format private_key
+        
+        # Memastikan format private_key bersih dari escape character
         if "private_key" in creds_dict:
-            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+            pk = creds_dict["private_key"]
+            pk = pk.replace("\\n", "\n")
+            if not pk.startswith("-----BEGIN PRIVATE KEY-----"):
+                pk = "-----BEGIN PRIVATE KEY-----\n" + pk
+            if not pk.strip().endswith("-----END PRIVATE KEY-----"):
+                pk = pk.strip() + "\n-----END PRIVATE KEY-----\n"
+            creds_dict["private_key"] = pk
             
         creds = service_account.Credentials.from_service_account_info(
             creds_dict, scopes=['https://www.googleapis.com/auth/drive.readonly']
