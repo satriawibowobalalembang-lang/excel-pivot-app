@@ -10,11 +10,15 @@ st.set_page_config(page_title="Aplikasi Pivot Data Besar CSV", layout="wide")
 st.title("📊 Multi-File CSV Pivot Dashboard")
 st.write("Aplikasi pengolah data besar dari folder Google Drive menggunakan Python & DuckDB.")
 
-# 1. Autentikasi Google Drive via Streamlit Secrets
+# 1. Autentikasi Google Drive via Streamlit Secrets (Aman dari error \n)
 @st.cache_resource
 def get_drive_service():
     if "gcp_service_account" in st.secrets:
         creds_dict = dict(st.secrets["gcp_service_account"])
+        # Perbaikan otomatis format private_key
+        if "private_key" in creds_dict:
+            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+            
         creds = service_account.Credentials.from_service_account_info(
             creds_dict, scopes=['https://www.googleapis.com/auth/drive.readonly']
         )
@@ -28,7 +32,6 @@ def get_drive_service():
 def load_all_csv_from_folder(folder_id):
     service = get_drive_service()
     
-    # Query file .csv di dalam folder ID
     query = f"'{folder_id}' in parents and mimeType='text/csv' and trashed=false"
     results = service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get('files', [])
@@ -53,7 +56,6 @@ def load_all_csv_from_folder(folder_id):
             _, done = downloader.next_chunk()
         
         fh.seek(0)
-        # Membaca file CSV dengan Pandas
         df = pd.read_csv(fh, low_memory=False)
         dataframes.append(df)
         
@@ -66,7 +68,7 @@ def load_all_csv_from_folder(folder_id):
 
 # Sidebar Input Folder ID
 st.sidebar.header("📁 Konfigurasi Google Drive")
-folder_id_input = st.sidebar.text_input("Masukkan Google Drive Folder ID:", "")
+folder_id_input = st.sidebar.text_input("Masukkan Google Drive Folder ID:", "1UEjMYCAFjVHHZhYY2QO-qmcX0EKq1zDt")
 
 if folder_id_input:
     with st.spinner("Mengunduh dan mengolah data CSV dari Google Drive..."):
