@@ -19,8 +19,8 @@ if uploaded_files:
     
     for idx, file in enumerate(uploaded_files):
         try:
-            # Menggunakan engine python agar fleksibel membaca format CSV yang tidak beraturan
-            df = pd.read_csv(file, sep=None, engine='python', on_bad_lines='skip', low_memory=False)
+            # Membaca file CSV dengan aman tanpa argumen yang bertabrakan
+            df = pd.read_csv(file, on_bad_lines='skip')
             dataframes.append(df)
         except Exception as e:
             st.error(f"Gagal membaca file {file.name}: {e}")
