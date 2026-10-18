@@ -19,8 +19,17 @@ if uploaded_files:
     
     for idx, file in enumerate(uploaded_files):
         try:
-            # Membaca file CSV dengan aman tanpa argumen yang bertabrakan
-            df = pd.read_csv(file, on_bad_lines='skip')
+            # Membaca CSV dengan pembatas titik koma (;) & fallback ke koma
+            try:
+                df = pd.read_csv(file, sep=';', on_bad_lines='skip')
+                # Jika pembacaan sep=';' hanya menghasilkan 1 kolom, coba pembacaan koma biasa
+                if len(df.columns) == 1:
+                    file.seek(0)
+                    df = pd.read_csv(file, sep=',', on_bad_lines='skip')
+            except Exception:
+                file.seek(0)
+                df = pd.read_csv(file, sep=',', on_bad_lines='skip')
+                
             dataframes.append(df)
         except Exception as e:
             st.error(f"Gagal membaca file {file.name}: {e}")
