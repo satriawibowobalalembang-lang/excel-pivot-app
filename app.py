@@ -2,25 +2,18 @@ import streamlit as st
 import pandas as pd
 import duckdb
 import io
-import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.backends import default_backend
 
 st.set_page_config(page_title="Aplikasi Pivot Data Besar CSV", layout="wide")
 st.title("📊 Multi-File CSV Pivot Dashboard")
 st.write("Aplikasi pengolah data besar dari folder Google Drive menggunakan Python & DuckDB.")
 
-# Autentikasi dengan pembersihan kriptografi kunci privat manual
+# Inisialisasi Service Account dengan pembersihan string privat key yang aman
 @st.cache_resource
 def get_drive_service():
-    creds_dict = {
-        "type": "service_account",
-        "project_id": "excel-pivot-app",
-        "private_key_id": "c67cde116477efcd5924adfb0a58369f6e34754b",
-        "private_key": """-----BEGIN PRIVATE KEY-----
+    private_key_text = """-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCZXdSpNHmixQC
 E16sXgqAyJ1oOP0Qw/qsUbGpjHCxVAZ2vOq26SdS5eeoMnJze3EtLExk+zm
 nX8VfWS82HqZzCIG3egamH3o+UA00R3rWVLfvS89I190QkLaPaPfTpqW39sftGpgt1
@@ -50,7 +43,16 @@ nrgJy3jvVecivnodLZ
 9jEYc/BhUcxUoAtY3RvAUphgfy3/uzsfya4k5PkQq9FcTLR4TjceQm6xNGDT7Iz
 n2CrKjDrDS2Lss2nsfYbmVQJRef19QVFg5fm0BeSjP5HEK7Qnp902WtbnnXx4rzLm
 nCRCXilI7pL/oy7qWeDj27A=
------END PRIVATE KEY-----""",
+-----END PRIVATE KEY-----"""
+    
+    # Memperbaiki format string escape enter agar valid dibaca library google-auth
+    private_key_text = private_key_text.strip().replace('\\n', '\n')
+
+    creds_dict = {
+        "type": "service_account",
+        "project_id": "excel-pivot-app",
+        "private_key_id": "c67cde116477efcd5924adfb0a58369f6e34754b",
+        "private_key": private_key_text,
         "client_email": "excel-reader@excel-pivot-app.iam.gserviceaccount.com",
         "client_id": "112150216549019737085",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
