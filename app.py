@@ -8,7 +8,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
-st.set_page_title("Aplikasi Pivot Data Besar Excel", layout="wide")
+st.set_page_config(page_title="Aplikasi Pivot Data Besar Excel", layout="wide")
 st.title("📊 Multi-File Excel Pivot Dashboard")
 st.write("Aplikasi pengolah data besar dari folder Google Drive menggunakan Python & DuckDB.")
 
