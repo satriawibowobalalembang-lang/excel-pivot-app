@@ -2,15 +2,18 @@ import streamlit as st
 import pandas as pd
 import duckdb
 import io
+import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 st.set_page_config(page_title="Aplikasi Pivot Data Besar CSV", layout="wide")
 st.title("📊 Multi-File CSV Pivot Dashboard")
 st.write("Aplikasi pengolah data besar dari folder Google Drive menggunakan Python & DuckDB.")
 
-# Autentikasi langsung di dalam kode (Aman & Tanpa Ribet Secrets)
+# Autentikasi dengan pembersihan kriptografi kunci privat manual
 @st.cache_resource
 def get_drive_service():
     creds_dict = {
